@@ -2,7 +2,7 @@
 
 ## Usage
 
-Run the server:
+Run the EAI server:
 ```
 python3 server.py
 ```
