@@ -10,17 +10,50 @@ HOST_NAME = 'localhost'
 PORT_NUMBER = 9000
 
 
+fake_data = {
+  'HR': {
+    'data': [{
+      'given_name': 'Jane',
+      'surname': 'Doe',
+      'date_of_birth': '1/2/2018',
+    }, {
+      'given_name': 'Jack',
+      'surname': 'Smith',
+      'date_of_birth': '1/2/1995',
+    }]
+  },
+  'Accounting': {
+    'data': [{
+      'item': 'laptop',
+      'cost': '1000',
+    }, {
+      'item': 'desk',
+      'cost': '500',
+    }]
+  }
+}
+
+
 class EAIRequestHandler(BaseHTTPRequestHandler):
 
   def do_GET(self):
+    self.send_response(200)
+    self.send_header("Content-type", "text/html")
+    self.end_headers()
+
     content_length = int(self.headers['Content-Length'])
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string)
 
     if self.path == '/data':
-      self.get_data(body)
+      data = self.get_data(body)
+      self.wfile.write(json.dumps(data).encode('utf-8'))
 
   def do_POST(self):
+    self.send_response(200)
+    self.send_header("Content-type", "text/html")
+    self.end_headers()
+
     content_length = int(self.headers['Content-Length'])
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string)
@@ -35,9 +68,8 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     EAIDatabase.register_service(body)
 
   def get_data(self, body):
-    import pdb; pdb.set_trace()
-    pass
-
+    data = fake_data.get(body['type'], {'data': []})
+    return data
 
 def run_server():
   print('Initializing database...')
