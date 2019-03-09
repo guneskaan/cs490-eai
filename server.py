@@ -1,7 +1,7 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from database import EAIDatabase
+from data.database import EAIDatabase
 from exceptions import (DatabaseException,
                         RequestException)
 
@@ -13,13 +13,12 @@ PORT_NUMBER = 9000
 class EAIRequestHandler(BaseHTTPRequestHandler):
 
   def do_GET(self):
-    self.send_response(200)
+    content_length = int(self.headers['Content-Length'])
+    body_string = self.rfile.read(content_length)
+    body = json.loads(body_string)
 
-    self.send_header('Content-type','text/html')
-    self.end_headers()
-
-    message = 'Hello world!'
-    self.wfile.write(bytes(message, 'utf8'))
+    if self.path == '/data':
+      self.get_data(body)
 
   def do_POST(self):
     content_length = int(self.headers['Content-Length'])
@@ -34,6 +33,10 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       raise RequestException('Registration request is missing fields.')
 
     EAIDatabase.register_service(body)
+
+  def get_data(self, body):
+    import pdb; pdb.set_trace()
+    pass
 
 
 def run_server():

@@ -1,1 +1,10 @@
-[{"service": "Test Service", "data_provided": ["HR", "Legal"]}]
+[
+    {
+        "service": "Test Service",
+        "id": 0
+    },
+    {
+        "service": "New Service",
+        "id": 1
+    }
+]
