@@ -68,6 +68,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     EAIDatabase.register_service(body)
 
   def get_data(self, body):
+    print('Found {} data'.format(body['type']))
     data = fake_data.get(body['type'], {'data': []})
     return data
 
