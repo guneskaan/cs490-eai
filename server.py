@@ -43,7 +43,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     content_length = int(self.headers['Content-Length'])
     body_string = self.rfile.read(content_length)
-    body = json.loads(body_string)
+    body = json.loads(body_string.decode('utf-8'))
 
     if self.path == '/data':
       data = self.get_data(body)
@@ -56,7 +56,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     content_length = int(self.headers['Content-Length'])
     body_string = self.rfile.read(content_length)
-    body = json.loads(body_string)
+    body = json.loads(body_string.decode('utf-8'))
 
     if self.path == '/register':
       self.register(body)

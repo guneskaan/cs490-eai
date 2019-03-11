@@ -27,3 +27,5 @@ class EAIDatabase:
         'data_provided': data_provided,
         'provider_id': service['id']
       })
+
+    print('Successfully registered service {} to provide {} data'.format(service_to_register['service'], ', '.join(service_to_register['data_provided'])))
