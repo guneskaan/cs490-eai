@@ -41,7 +41,7 @@ var moveChart = dc.lineChart('#monthly-move-chart');
 //d3.json('data.json', function(data) {...});
 //jQuery.getJson('data.json', function(data){...});
 //```
-d3.csv('data/delayOnTimeWithFlag.csv', function (data) {
+d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
     // Since its a csv file we need to format the data a bit.
     var dateFormat = d3.time.format('%m/%d/%Y');
     var numberFormat = d3.format('.2f');
@@ -136,7 +136,7 @@ d3.csv('data/delayOnTimeWithFlag.csv', function (data) {
     // End of Filter for Graph 2 ---------------------------------------
 
     // Filter for Graph 4
-    
+
     // Counts per weekday
     var total_flights_by_day = {}
     var dayOfWeek = ndx.dimension(function (d) {
@@ -171,7 +171,7 @@ d3.csv('data/delayOnTimeWithFlag.csv', function (data) {
             }
         }
     );
-    
+
     // End of Filter for Graph 4 ---------------------------------------
 
     // Filter for Graph 5
@@ -357,7 +357,7 @@ d3.csv('data/delayOnTimeWithFlag.csv', function (data) {
     // on other charts within the same chart group.
     // <br>API: [Pie Chart](https://github.com/dc-js/dc.js/blob/master/web/docs/api-latest.md#pie-chart)
     /*dc.pieChart('#delay-ontime-chart', 'chartGroup') */
-    delayOnTimeChart 
+    delayOnTimeChart
     // (_optional_) define chart width, `default = 200`
         .width(180)
         // (optional) define chart height, `default = 200`
@@ -390,7 +390,7 @@ d3.csv('data/delayOnTimeWithFlag.csv', function (data) {
     // on other charts within the same chart group.
     // <br>API: [Row Chart](https://github.com/dc-js/dc.js/blob/master/web/docs/api-latest.md#row-chart)
     /* dc.rowChart('#day-of-week-chart', 'chartGroup') */
-    dayOfWeekChart 
+    dayOfWeekChart
         .width(180)
         .height(180)
         .margins({top: 20, left: 10, right: 20, bottom: 20})
@@ -447,7 +447,7 @@ d3.csv('data/delayOnTimeWithFlag.csv', function (data) {
     // on other charts within the same chart group.
     // <br>API: [Bar Chart](https://github.com/dc-js/dc.js/blob/master/web/docs/api-latest.md#bar-chart)
     /* dc.barChart('#volume-month-chart', 'chartGroup') */
-    fluctuationChart 
+    fluctuationChart
         .width(450)
         .height(200)
         .margins({top: 10, right: 50, bottom: 35, left: 65})
@@ -484,7 +484,7 @@ d3.csv('data/delayOnTimeWithFlag.csv', function (data) {
     // <br>API: [Stack Mixin](https://github.com/dc-js/dc.js/blob/master/web/docs/api-latest.md#stack-mixin),
     // [Line Chart](https://github.com/dc-js/dc.js/blob/master/web/docs/api-latest.md#line-chart)
     /* dc.lineChart('#monthly-move-chart', 'chartGroup') */
-    moveChart 
+    moveChart
         .renderArea(true)
         .width(990)
         .height(200)
@@ -511,7 +511,7 @@ d3.csv('data/delayOnTimeWithFlag.csv', function (data) {
             return dateFormat(d.key) + '\n' + numberFormat(d.value.totalcount)
         })
         .yAxis().tickFormat(function(v) {
-            return v 
+            return v
         })
 
     //#### Rendering
