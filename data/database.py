@@ -27,3 +27,7 @@ class EAIDatabase:
         'data_provided': data_provided,
         'provider_id': service['id']
       })
+
+  @classmethod
+  def get_datatypes(cls):
+    return cls.data_providers_table.get_datatypes_provided()

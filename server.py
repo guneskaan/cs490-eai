@@ -41,13 +41,16 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     self.send_header("Content-type", "text/html")
     self.end_headers()
 
-    content_length = int(self.headers['Content-Length'])
+    content_length = int(self.headers['Content-Length'] or 0)
     body_string = self.rfile.read(content_length)
-    body = json.loads(body_string)
+    body = json.loads(body_string) if body_string else {}
 
     if self.path == '/data':
       data = self.get_data(body)
       self.wfile.write(json.dumps(data).encode('utf-8'))
+    if self.path == '/datatypes':
+      datatypes = self.get_datatypes()
+      self.wfile.write(json.dumps(datatypes).encode('utf-8'))
 
   def do_POST(self):
     self.send_response(200)
@@ -70,6 +73,9 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
   def get_data(self, body):
     data = fake_data.get(body['type'], {'data': []})
     return data
+
+  def get_datatypes(self):
+    return EAIDatabase.get_datatypes()
 
 def run_server():
   print('Initializing database...')
