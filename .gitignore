@@ -1,1 +1,5 @@
 __pycache__/
+.DS_Store
+data_providers.txt
+registered_services.txt
+request_log.txt

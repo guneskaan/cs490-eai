@@ -1,0 +1,158 @@
+
+/*
+if don't like the style comment out the following
+*/
+
+#section-intro {
+    background-image: url("../pictures/airport.jpg");
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 0;
+}
+
+#section-middle {
+    height: 100%;
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)
+    ), url("../pictures/Delayed.jpg"), center, no-repeat;
+    background-size: cover;
+    padding: 0;
+}
+
+#prototype {
+    height: 100%;
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)
+    ), url("../pictures/again_delay.jpg"), center, no-repeat;
+    background-size: cover;
+    padding: 0;
+}
+
+#airport-section {
+    height: 100%;
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)
+    ), url("../pictures/nice_flight.jpg"), center, no-repeat;
+    background-size: cover;
+    padding: 0;
+}
+
+#hourglass {
+    background-image: url("../pictures/7.jpg");
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 0;
+}
+
+#ap {
+    height: 100%;
+    padding: 0;
+    background: linear-gradient(
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.7)
+    ), url("../pictures/airport 7.jpg"), center, no-repeat;
+    background-size: cover;
+}
+
+#pre-proto {
+    height: 100%;
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)
+    ), url("../pictures/again_delay.jpg"), center, no-repeat;
+    background-size: cover;
+    padding: 0;
+    list-style-position:inside;
+    font-size: 150%;
+}
+
+#pre-ap {
+    height: 100%;
+    padding: 0;
+    background: linear-gradient(
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.7)
+    ), url("../pictures/airport 7.jpg"), center, no-repeat;
+    background-size: cover;
+    list-style-position:inside;
+    font-size: 150%;
+}
+
+#pre-as {
+    height: 100%;
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)
+    ), url("../pictures/nice_flight.jpg"), center, no-repeat;
+    background-size: cover;
+    padding: 0;
+    list-style-position:inside;
+    font-size: 150%;
+}
+/*
+#texta {
+    text-align: left;
+    width: 50%;
+    margin: 0 auto;
+}
+
+#textb {
+    text-align: left;
+    width: 50%;
+    margin: 0 auto;
+    
+}
+
+#textc {
+    text-align: left;
+    width: 50%;
+    margin: 0 auto;
+}
+*/
+#cdiv {
+    width: 90%;
+    margin: 0 auto;
+    color: white;
+    text-align: left;
+}
+
+#bdiv {
+    width: 90%;
+    margin: 0 auto;
+    color: white;
+    text-align: left;
+}
+
+#adiv {
+    width: 90%;
+    margin: 0 auto;
+    color: white;
+    text-align: left;
+}
+
+#info {
+    padding-left: 45px;
+    
+}
+
+#ref {
+    padding-right: 45px;
+}
+
+#about-page {
+    height: 100%;
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)
+    ), url("../pictures/8.jpg"), center, no-repeat;
+    background-size: cover;
+    padding: 0;
+    color: azure;
+}

@@ -59,7 +59,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     content_length = int(self.headers['Content-Length'])
     body_string = self.rfile.read(content_length)
-    body = json.loads(body_string)
+    body = json.loads(body_string.decode('utf-8'))
 
     if self.path == '/register':
       self.register(body)
@@ -71,6 +71,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     EAIDatabase.register_service(body)
 
   def get_data(self, body):
+    print('Found {} data'.format(body['type']))
     data = fake_data.get(body['type'], {'data': []})
     return data
 
