@@ -11,15 +11,11 @@ PORT_NUMBER = 9000
 
 
 fake_data = {
-  'HR': {
+  'HRPersonnel': {
     'data': [{
       'given_name': 'Jane',
       'surname': 'Doe',
-      'date_of_birth': '1/2/2018',
-    }, {
-      'given_name': 'Jack',
-      'surname': 'Smith',
-      'date_of_birth': '1/2/1995',
+      'date_of_birth': '1/1/2018'
     }]
   },
   'Accounting': {
