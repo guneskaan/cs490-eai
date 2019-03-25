@@ -3,3 +3,4 @@ __pycache__/
 data_providers.txt
 registered_services.txt
 request_log.txt
+nohup.out
