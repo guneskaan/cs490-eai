@@ -10,6 +10,10 @@ class Table:
     self.data = self.load_data()
 
   def load_data(self):
+    if not os.path.exists(self.filename):
+      with open(self.filename, 'w'):
+        return []
+
     with open(self.filename, 'r+') as f:
       data = f.read()
       return json.loads(data) if data else []
