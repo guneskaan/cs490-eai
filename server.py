@@ -64,6 +64,8 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     if not all(attr in body for attr in ('service', 'data_provided')):
       raise RequestException('Registration request is missing fields.')
 
+    print('Registering service {} to provide {}'.format(body['service'], body['data_provided']))
+
     EAIDatabase.register_service(body)
 
   def get_data(self, body):
