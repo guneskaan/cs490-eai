@@ -58,15 +58,16 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     body = json.loads(body_string.decode('utf-8'))
 
     if self.path == '/register':
-      self.register(body)
+      ip, _ = self.client_address
+      self.register(ip, body)
 
-  def register(self, body):
+  def register(self, ip, body):
     if not all(attr in body for attr in ('service', 'data_provided')):
       raise RequestException('Registration request is missing fields.')
 
     print('Registering service {} to provide {}'.format(body['service'], body['data_provided']))
 
-    EAIDatabase.register_service(body)
+    EAIDatabase.register_service(ip, body)
 
   def get_data(self, body):
     print('Found {} data'.format(body['type']))

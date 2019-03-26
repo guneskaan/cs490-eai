@@ -18,9 +18,10 @@ class EAIDatabase:
     cls.request_log_table = RequestLogTable(request_log_file)
 
   @classmethod
-  def register_service(cls, service_to_register):
+  def register_service(cls, ip, service_to_register):
     service = cls.registered_services_table.upsert_row({
-      'service': service_to_register['service']
+      'ip': ip,
+      'service': service_to_register['service'],
     })
     for data_provided in service_to_register['data_provided']:
       cls.data_providers_table.upsert_row({
