@@ -41,7 +41,7 @@ var moveChart = dc.lineChart('#monthly-move-chart');
 //d3.json('data.json', function(data) {...});
 //jQuery.getJson('data.json', function(data){...});
 //```
-d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
+d3.csv('reqdata/reqlog.csv', function (data) {
     // Since its a csv file we need to format the data a bit.
     var dateFormat = d3.time.format('%m/%d/%Y');
     var numberFormat = d3.format('.2f');
@@ -50,7 +50,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         d.dd = dateFormat.parse(d.FIDate);
         d.month = d3.time.month(d.dd); // pre-calculate month for better performance
         d.delayFlag = +d.delayFlag
-        d.Count = +d.Count
+        d.Count = 1
         d.DepDelayMin = +d.DepDelayMin
         d.CarrierDelay = +d.CarrierDelay
         d.WeatherDelay = +d.WeatherDelay
@@ -291,7 +291,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         })
         // `.keyAccessor` - the `X` value will be passed to the `.x()` scale to determine pixel location
         .keyAccessor(function (p) {
-            return p.value.totalcount / 360.0;
+            return p.value.totalcount;
         })
         // `.valueAccessor` - the `Y` value will be passed to the `.y()` scale to determine pixel location
         .valueAccessor(function (p) {
@@ -300,12 +300,12 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         // `.radiusValueAccessor` - the value will be passed to the `.r()` scale to determine radius size;
         //   by default this maps linearly to [0,100]
         .radiusValueAccessor(function (p) {
-            return p.value.totalcount / 3500.0
+            return p.value.totalcount
         })
         .maxBubbleRelativeSize(0.3)
         .x(d3.scale.linear().domain([0, 1500000]))
         .y(d3.scale.linear().domain([0, 100]))
-        .r(d3.scale.linear().domain([0, 4000]))
+        .r(d3.scale.linear().domain([0, 100]))
         //##### Elastic Scaling
 
         //`.elasticY` and `.elasticX` determine whether the chart should rescale each axis to fit the data.
@@ -314,7 +314,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         //`.yAxisPadding` and `.xAxisPadding` add padding to data above and below their max values in the same unit
         //domains as the Accessors.
         .yAxisPadding(300)
-        .xAxisPadding(500)
+        .xAxisPadding(5)
         // (_optional_) render horizontal grid lines, `default=false`
         .renderHorizontalGridLines(true)
         // (_optional_) render vertical grid lines, `default=false`
@@ -415,7 +415,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
             }
         })
         .valueAccessor(function (p) {
-            return Math.abs(p.value.totalcount) / 1000.0
+            return Math.abs(p.value.totalcount)
         })
         // Assign colors to each value in the x scale domain
         .ordinalColors(['#3182bd', '#99dfef', '#3182bd', '#99dfef', '#3182bd','#99dfef','#3182bd'])
@@ -464,7 +464,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
             return p.value.count
         })
         .renderHorizontalGridLines(true)
-        .x(d3.scale.linear().domain([0, 150]))
+        .x(d3.scale.linear().domain([0, 1500]))
         .elasticY(true)
         .xAxisLabel('Average Response Size \(KB\)')
         .yAxisLabel('Number of Requests')
