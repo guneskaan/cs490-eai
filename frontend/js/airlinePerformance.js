@@ -43,7 +43,7 @@ var moveChart = dc.lineChart('#monthly-move-chart');
 //```
 d3.csv('reqdata/reqlog.csv', function (data) {
     // Since its a csv file we need to format the data a bit.
-    var dateFormat = d3.time.format('%m/%d/%Y');
+    var dateFormat = d3.time.format('%Y-%m-%dT%H:%M:%S');
     var numberFormat = d3.format('.2f');
     var total_num_flights = 0
     data.forEach(function (d) {
@@ -316,7 +316,7 @@ d3.csv('reqdata/reqlog.csv', function (data) {
         //`.yAxisPadding` and `.xAxisPadding` add padding to data above and below their max values in the same unit
         //domains as the Accessors.
         .yAxisPadding(300)
-        .xAxisPadding(5)
+        .xAxisPadding(3)
         // (_optional_) render horizontal grid lines, `default=false`
         .renderHorizontalGridLines(true)
         // (_optional_) render vertical grid lines, `default=false`
@@ -500,7 +500,7 @@ d3.csv('reqdata/reqlog.csv', function (data) {
         .valueAccessor(function (d) {
             return d.value.totalcount;
         })
-        .x(d3.time.scale().domain([new Date(1985, 0, 1), new Date(2012, 11, 31)]))
+        .x(d3.time.scale().domain([new Date(2019, 0, 1), new Date(2019, 11, 31)]))
         .round(d3.time.month.round)
         .xUnits(d3.time.months)
         .elasticY(true)
