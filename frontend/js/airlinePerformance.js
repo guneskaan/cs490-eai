@@ -47,16 +47,18 @@ d3.csv('reqdata/reqlog.csv', function (data) {
     var numberFormat = d3.format('.2f');
     var total_num_flights = 0
     data.forEach(function (d) {
-        d.dd = dateFormat.parse(d.FIDate);
+        d.dd = dateFormat.parse(d.Timestamp);
         d.month = d3.time.month(d.dd); // pre-calculate month for better performance
-        d.delayFlag = +d.delayFlag
+        d.delayFlag = +d.ResponseSuccess
         d.Count = 1
-        d.DepDelayMin = +d.DepDelayMin
-        d.CarrierDelay = +d.CarrierDelay
-        d.WeatherDelay = +d.WeatherDelay
-        d.NASDelay = +d.NASDelay
-        d.SecurityDelay = +d.SecurityDelay
-        d.LateAircraftDelay = +d.LateAircraftDelay
+        d.DepDelayMin = +d.ResponseSize
+        d.CarrierDelay = 0
+        d.UniqueCarrier = d.Requester
+        d.Responder = d.Responder
+        d.WeatherDelay = 0
+        d.NASDelay = 0
+        d.SecurityDelay = 0
+        d.LateAircraftDelay = 0
     });
 
     //### Create Crossfilter Dimensions and Groups
@@ -465,7 +467,7 @@ d3.csv('reqdata/reqlog.csv', function (data) {
         })
         .renderHorizontalGridLines(true)
         .x(d3.scale.linear().domain([0, 1500]))
-        .elasticY(true)
+        .y(d3.scale.linear().domain([0, 2]))
         .xAxisLabel('Average Response Size \(KB\)')
         .yAxisLabel('Number of Requests')
         .renderTitle(true)
@@ -473,7 +475,7 @@ d3.csv('reqdata/reqlog.csv', function (data) {
         // Customize the filter displayed in the control span
         .filterPrinter(function (filters) {
             var filter = filters[0], s = '';
-            s += numberFormat(filter[0]) + ' ~ ' + numberFormat(filter[1]) + ' mins';
+            s += numberFormat(filter[0]) + ' ~ ' + numberFormat(filter[1]) + ' KBs';
             return s;
         })
 
@@ -504,7 +506,7 @@ d3.csv('reqdata/reqlog.csv', function (data) {
         .elasticY(true)
         .elasticX(true)
         .renderHorizontalGridLines(true)
-        .xAxisLabel('Month')
+        .xAxisLabel('Day')
         .yAxisLabel('Number of Requests')
         .renderTitle(true)
         .title(function (d) {
