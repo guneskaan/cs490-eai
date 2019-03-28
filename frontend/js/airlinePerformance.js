@@ -41,22 +41,24 @@ var moveChart = dc.lineChart('#monthly-move-chart');
 //d3.json('data.json', function(data) {...});
 //jQuery.getJson('data.json', function(data){...});
 //```
-d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
+d3.csv('reqdata/reqlog.csv', function (data) {
     // Since its a csv file we need to format the data a bit.
-    var dateFormat = d3.time.format('%m/%d/%Y');
+    var dateFormat = d3.time.format('%Y-%m-%dT%H:%M:%S');
     var numberFormat = d3.format('.2f');
     var total_num_flights = 0
     data.forEach(function (d) {
-        d.dd = dateFormat.parse(d.FIDate);
+        d.dd = dateFormat.parse(d.Timestamp);
         d.month = d3.time.month(d.dd); // pre-calculate month for better performance
-        d.delayFlag = +d.delayFlag
-        d.Count = +d.Count
-        d.DepDelayMin = +d.DepDelayMin
-        d.CarrierDelay = +d.CarrierDelay
-        d.WeatherDelay = +d.WeatherDelay
-        d.NASDelay = +d.NASDelay
-        d.SecurityDelay = +d.SecurityDelay
-        d.LateAircraftDelay = +d.LateAircraftDelay
+        d.delayFlag = +d.ResponseSuccess
+        d.Count = 1
+        d.DepDelayMin = +d.ResponseSize
+        d.CarrierDelay = 0
+        d.UniqueCarrier = d.Requester
+        d.Responder = d.Responder
+        d.WeatherDelay = 0
+        d.NASDelay = 0
+        d.SecurityDelay = 0
+        d.LateAircraftDelay = 0
     });
 
     //### Create Crossfilter Dimensions and Groups
@@ -291,7 +293,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         })
         // `.keyAccessor` - the `X` value will be passed to the `.x()` scale to determine pixel location
         .keyAccessor(function (p) {
-            return p.value.totalcount / 360.0;
+            return p.value.totalcount;
         })
         // `.valueAccessor` - the `Y` value will be passed to the `.y()` scale to determine pixel location
         .valueAccessor(function (p) {
@@ -300,12 +302,12 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         // `.radiusValueAccessor` - the value will be passed to the `.r()` scale to determine radius size;
         //   by default this maps linearly to [0,100]
         .radiusValueAccessor(function (p) {
-            return p.value.totalcount / 3500.0
+            return p.value.totalcount
         })
         .maxBubbleRelativeSize(0.3)
         .x(d3.scale.linear().domain([0, 1500000]))
         .y(d3.scale.linear().domain([0, 100]))
-        .r(d3.scale.linear().domain([0, 4000]))
+        .r(d3.scale.linear().domain([0, 100]))
         //##### Elastic Scaling
 
         //`.elasticY` and `.elasticX` determine whether the chart should rescale each axis to fit the data.
@@ -314,7 +316,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         //`.yAxisPadding` and `.xAxisPadding` add padding to data above and below their max values in the same unit
         //domains as the Accessors.
         .yAxisPadding(300)
-        .xAxisPadding(500)
+        .xAxisPadding(3)
         // (_optional_) render horizontal grid lines, `default=false`
         .renderHorizontalGridLines(true)
         // (_optional_) render vertical grid lines, `default=false`
@@ -415,7 +417,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
             }
         })
         .valueAccessor(function (p) {
-            return Math.abs(p.value.totalcount) / 1000.0
+            return Math.abs(p.value.totalcount)
         })
         // Assign colors to each value in the x scale domain
         .ordinalColors(['#3182bd', '#99dfef', '#3182bd', '#99dfef', '#3182bd','#99dfef','#3182bd'])
@@ -464,8 +466,8 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
             return p.value.count
         })
         .renderHorizontalGridLines(true)
-        .x(d3.scale.linear().domain([0, 150]))
-        .elasticY(true)
+        .x(d3.scale.linear().domain([0, 1500]))
+        .y(d3.scale.linear().domain([0, 2]))
         .xAxisLabel('Average Response Size \(KB\)')
         .yAxisLabel('Number of Requests')
         .renderTitle(true)
@@ -473,7 +475,7 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         // Customize the filter displayed in the control span
         .filterPrinter(function (filters) {
             var filter = filters[0], s = '';
-            s += numberFormat(filter[0]) + ' ~ ' + numberFormat(filter[1]) + ' mins';
+            s += numberFormat(filter[0]) + ' ~ ' + numberFormat(filter[1]) + ' KBs';
             return s;
         })
 
@@ -498,13 +500,13 @@ d3.csv('reqdata/delayOnTimeWithFlag.csv', function (data) {
         .valueAccessor(function (d) {
             return d.value.totalcount;
         })
-        .x(d3.time.scale().domain([new Date(1985, 0, 1), new Date(2012, 11, 31)]))
+        .x(d3.time.scale().domain([new Date(2019, 0, 1), new Date(2019, 11, 31)]))
         .round(d3.time.month.round)
         .xUnits(d3.time.months)
         .elasticY(true)
         .elasticX(true)
         .renderHorizontalGridLines(true)
-        .xAxisLabel('Month')
+        .xAxisLabel('Day')
         .yAxisLabel('Number of Requests')
         .renderTitle(true)
         .title(function (d) {
