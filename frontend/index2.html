@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+
+      <link rel="stylesheet" type="text/css" href="css/style.css"/>
+      <!-- Bootstrap CDN -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+      <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+      <!-- Prototype CSS -->
+      <link rel="stylesheet" type="text/css" href="css/prototype.css" />
+      <!-- Template CSS Files -->
+      <link rel="stylesheet" type="text/css" href="lib/dc.css"/>
+      <style>
+        .line {
+          fill: none;
+          stroke: rgb(153, 223, 239);
+          stroke-width: 1.5px;
+        }
+        .axis{
+          stroke: #fff;
+        }
+        .domain{
+          stroke: #fff;
+        }
+        .tick line{
+          stroke: #fff !important;
+        }
+
+      </style>
+  </head>
+  <body>
+    <div id="fullpage" style="position: absolute; height:100%; width:100%;">
+      <div class="section text-white" id="ap">
+          <div class="container-fluid">
+              <h2 class="mx-auto text-center">Live Request Dashboard</h2>
+
+              <div class="row">
+                  <svg width="960" height="500"></svg>
+              </div>
+          </div>
+      </div>
+      <script type="text/javascript" src="lib/d3.v4.min.js"></script>
+      <script>
+        var n = 40,
+            random = d3.randomNormal(50, 20),
+            data = d3.range(n).map(random);
+
+        var svg = d3.select("svg"),
+            margin = {top: 20, right: 20, bottom: 20, left: 40},
+            width = +svg.attr("width") - margin.left - margin.right,
+            height = +svg.attr("height") - margin.top - margin.bottom,
+            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var x = d3.scaleLinear()
+            .domain([0, n - 1])
+            .range([0, width]);
+
+        var y = d3.scaleLinear()
+            .domain([0, 100])
+            .range([height, 0]);
+
+        var line = d3.line()
+            .x(function(d, i) { return x(i); })
+            .y(function(d, i) { return y(d); });
+
+        g.append("defs").append("clipPath")
+            .attr("id", "clip")
+          .append("rect")
+            .attr("width", width)
+            .attr("height", height);
+
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + y(0) + ")")
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y));
+
+        g.append("g")
+            .attr("clip-path", "url(#clip)")
+          .append("path")
+            .datum(data)
+            .attr("class", "line")
+          .transition()
+            .duration(5000)
+            .ease(d3.easeLinear)
+            .on("start", tick);
+
+        function tick() {
+          // Push a new data point onto the back.
+          data.push(random());
+          // Redraw the line.
+          d3.select(this)
+              .attr("d", line)
+              .attr("transform", null);
+          // Slide it to the left.
+          d3.active(this)
+              .attr("transform", "translate(" + x(-1) + ",0)")
+            .transition()
+              .on("start", tick);
+          // Pop the old data point off the front.
+          data.shift();
+        }
+      </script>
+    </div>
+  </body>
+</html>
