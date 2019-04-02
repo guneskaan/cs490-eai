@@ -66,6 +66,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       raise RequestException('Registration request is missing fields.')
 
     print('Registering service {} to provide {}'.format(body['service'], body['data_provided']))
+    print('Client IP Adress:' + self.client_address[0])
     self.wfile.write(bytes
                      ('Registering service {} to provide {} datatypes at IP Address {}\n'.
                      format(body['service'], body['data_provided'], ip)+
