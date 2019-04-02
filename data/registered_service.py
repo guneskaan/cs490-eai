@@ -5,7 +5,12 @@ class RegisteredServiceTable(Table):
 
   columns = ['id', 'service']
 
-  def find_row(self, row_to_find):
+  def find_ip_row(self, row_to_find):
     for row in self.data:
       if row['id'] == row_to_find['id']:
+        return row
+
+  def find_row(self, row_to_find):
+    for row in self.data:
+      if row['service'] == row_to_find['service']:
         return row

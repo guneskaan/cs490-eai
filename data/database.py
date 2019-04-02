@@ -35,9 +35,9 @@ class EAIDatabase:
 
   @classmethod
   def find_ip(cls, type):
-    service = cls.data_providers_table.find_row({
+    service = cls.data_providers_table.find_ip_row({
         'data_provided': type
     })
-    return cls.registered_services_table.find_row({
+    return cls.registered_services_table.find_ip_row({
         'id': service['provider_id']
     })['ip']
