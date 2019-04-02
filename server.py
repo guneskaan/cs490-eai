@@ -62,7 +62,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     body = json.loads(body_string.decode('utf-8'))
 
     if self.path == '/register':
-      ip, _ = self.headers["X-Real-IP"]
+      ip = self.headers["X-Real-IP"]
       self.register(ip, body)
 
   def register(self, ip, body):
