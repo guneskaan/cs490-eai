@@ -66,6 +66,11 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       raise RequestException('Registration request is missing fields.')
 
     print('Registering service {} to provide {}'.format(body['service'], body['data_provided']))
+    self.wfile.write(bytes
+                     ('Registering service {} to provide {} datatypes at IP Address {}\n'.
+                     format(body['service'], body['data_provided'], ip)+
+                      'Please make sure this IP Address can respond to requests at /get_data endpoint as per our API Reference Guidelines\n'
+                      +'If this is not a static ip address, please contact the EAI Communication Officer with your static ip address', "utf-8"))
 
     EAIDatabase.register_service(ip, body)
 
