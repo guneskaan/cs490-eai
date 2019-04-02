@@ -39,7 +39,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     content_length = int(self.headers['Content-Length'] or 0)
     body_string = self.rfile.read(content_length)
-    body = json.loads(body_string) if body_string else {}
+    body = json.loads(body_string.decode('utf-8')) if body_string else {}
 
     if self.path == '/data':
       data = self.get_data(body)
