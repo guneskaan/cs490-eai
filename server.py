@@ -1,4 +1,5 @@
 import json
+import requests
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from data.database import EAIDatabase
@@ -42,8 +43,11 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     body = json.loads(body_string.decode('utf-8')) if body_string else {}
 
     if self.path == '/data':
-      data = self.get_data(body)
-      self.wfile.write(json.dumps(data).encode('utf-8'))
+      payload = {'type': body['type'],'constraints': body['constraints']}
+      reqip = EAIDatabase.find_ip(body['type'])
+      r = requests.get('http://' + reqip + '/get_data',
+                     data = json.dumps(payload))
+      self.wfile.write(bytes(r.text, "utf-8"))
     if self.path == '/datatypes':
       datatypes = self.get_datatypes()
       self.wfile.write(json.dumps(datatypes).encode('utf-8'))
@@ -66,7 +70,6 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       raise RequestException('Registration request is missing fields.')
 
     print('Registering service {} to provide {}'.format(body['service'], body['data_provided']))
-    print('Client IP Adress:' + self.client_address[0])
     self.wfile.write(bytes
                      ('Registering service {} to provide {} datatypes at IP Address {}\n'.
                      format(body['service'], body['data_provided'], ip)+

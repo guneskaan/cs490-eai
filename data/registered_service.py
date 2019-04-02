@@ -7,5 +7,5 @@ class RegisteredServiceTable(Table):
 
   def find_row(self, row_to_find):
     for row in self.data:
-      if row['service'] == row_to_find['service']:
+      if row['id'] == row_to_find['id']:
         return row
