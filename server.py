@@ -41,8 +41,9 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     if self.path == '/data':
       payload = {'type': body['type'],'constraints': body['constraints']}
       reqip = EAIDatabase.find_ip(body['type'])
+      headers = {'content-type': 'application/json'}
       r = requests.get('http://' + reqip + '/get_data',
-                     data = json.dumps(payload))
+                     data = json.dumps(payload), headers = headers)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
