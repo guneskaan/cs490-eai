@@ -55,18 +55,26 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       self.wfile.write(json.dumps(datatypes).encode('utf-8'))
 
   def do_POST(self):
-    self.send_response(200)
-    self.send_header("Content-type", "text/html")
-    self.end_headers()
-
     content_length = int(self.headers['Content-Length'])
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string.decode('utf-8'))
 
     if self.path == '/register':
+      self.send_response(200)
+      self.send_header("Content-type", "text/html")
+      self.end_headers()
       ip = self.headers["X-Real-IP"]
       self.register(ip, body)
 
+    if self.path == '/data':
+      payload = {'type': body['type'],'constraints': body['constraints']}
+      reqip = EAIDatabase.find_ip(body['type'])
+      r = requests.get('http://' + reqip + '/get_data',
+                     data = json.dumps(payload))
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/json')
+      self.end_headers()
+      self.wfile.write(json.dumps(r.text).encode('utf-8'))
   def register(self, ip, body):
     if not all(attr in body for attr in ('service', 'data_provided')):
       raise RequestException('Registration request is missing fields.')
