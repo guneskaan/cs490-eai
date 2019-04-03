@@ -45,66 +45,94 @@
       </div>
       <script type="text/javascript" src="lib/d3.v4.min.js"></script>
       <script>
-        var n = 40,
-            random = d3.randomNormal(50, 20),
-            data = d3.range(n).map(random);
+        var lastTime;
+        var data = [];
+        var n;
+        d3.csv('reqdata/reqlog.csv'+'?'+ Math.floor(Math.random() * 1000), function (reqdata) {
+            // Since its a csv file we need to format the data a bit.
+            var dateFormat = d3.timeParse('%Y-%m-%dT%H:%M:%S');
+            lastTime = d3.timeSecond(dateFormat(reqdata[reqdata.length-1].Timestamp)).toString();
+            console.log("starting lastTime is:" + lastTime);
+            reqdata.forEach(function (d) {
+              d.dd = dateFormat(d.Timestamp);
+              d.second = d3.timeSecond(d.dd); // pre-calculate month for better performance
+              data.push(parseInt(d.ResponseSize));
+            });
+            n = reqdata.length;
+            console.log(data);
+        });
+        var svg,x,y,line;
+        setTimeout(function(){
+          svg = d3.select("svg"),
+              margin = {top: 20, right: 20, bottom: 20, left: 40},
+              width = +svg.attr("width") - margin.left - margin.right,
+              height = +svg.attr("height") - margin.top - margin.bottom,
+              g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        var svg = d3.select("svg"),
-            margin = {top: 20, right: 20, bottom: 20, left: 40},
-            width = +svg.attr("width") - margin.left - margin.right,
-            height = +svg.attr("height") - margin.top - margin.bottom,
-            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+          x = d3.scaleLinear()
+              .domain([0, n - 1])
+              .range([0, width]);
 
-        var x = d3.scaleLinear()
-            .domain([0, n - 1])
-            .range([0, width]);
+          y = d3.scaleLinear()
+              .domain([0, 1500])
+              .range([height, 0]);
 
-        var y = d3.scaleLinear()
-            .domain([0, 100])
-            .range([height, 0]);
+          line = d3.line()
+              .x(function(d, i) { return x(i); })
+              .y(function(d, i) { return y(d); });
 
-        var line = d3.line()
-            .x(function(d, i) { return x(i); })
-            .y(function(d, i) { return y(d); });
+          g.append("defs").append("clipPath")
+              .attr("id", "clip")
+            .append("rect")
+              .attr("width", width)
+              .attr("height", height);
 
-        g.append("defs").append("clipPath")
-            .attr("id", "clip")
-          .append("rect")
-            .attr("width", width)
-            .attr("height", height);
+          g.append("g")
+              .attr("class", "axis axis--x")
+              .attr("transform", "translate(0," + y(0) + ")")
+              .call(d3.axisBottom(x));
 
-        g.append("g")
-            .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + y(0) + ")")
-            .call(d3.axisBottom(x));
+          g.append("g")
+              .attr("class", "axis axis--y")
+              .call(d3.axisLeft(y));
 
-        g.append("g")
-            .attr("class", "axis axis--y")
-            .call(d3.axisLeft(y));
-
-        g.append("g")
-            .attr("clip-path", "url(#clip)")
-          .append("path")
-            .datum(data)
-            .attr("class", "line")
-          .transition()
-            .duration(5000)
-            .ease(d3.easeLinear)
-            .on("start", tick);
+          g.append("g")
+              .attr("clip-path", "url(#clip)")
+            .append("path")
+              .datum(data)
+              .attr("class", "line")
+            .transition()
+              .duration(5000)
+              .ease(d3.easeLinear)
+              .on("start", tick);
+        }, 5000);
 
         function tick() {
+          d3.csv('reqdata/reqlog.csv'+'?'+ Math.floor(Math.random() * 1000),function (data) {
+            // Since its a csv file we need to format the data a bit.
+            var dateFormat = d3.timeParse('%Y-%m-%dT%H:%M:%S');
+            d = data[data.length-1];
+            d.dd = dateFormat(d.Timestamp);
+            d.second = d3.timeSecond(d.dd); // pre-calculate month for better performance
+            if(lastTime != d.second){
+              console.log("lasttime:" + lastTime);
+              lastTime = d.second.toString();
+              console.log("new request!");
+              console.log("d.second:" + d.second)
+            }
+          });
           // Push a new data point onto the back.
-          data.push(random());
-          // Redraw the line.
+          data.push(200);
+          //Redraw the line.
           d3.select(this)
               .attr("d", line)
               .attr("transform", null);
-          // Slide it to the left.
+          // // Slide it to the left.
           d3.active(this)
               .attr("transform", "translate(" + x(-1) + ",0)")
             .transition()
               .on("start", tick);
-          // Pop the old data point off the front.
+          // // Pop the old data point off the front.
           data.shift();
         }
       </script>
