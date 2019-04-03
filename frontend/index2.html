@@ -46,12 +46,14 @@
       <script type="text/javascript" src="lib/d3.v4.min.js"></script>
       <script>
         var lastTime;
+        var lastSize;
         var data = [];
         var n;
         d3.csv('reqdata/reqlog.csv'+'?'+ Math.floor(Math.random() * 1000), function (reqdata) {
             // Since its a csv file we need to format the data a bit.
             var dateFormat = d3.timeParse('%Y-%m-%dT%H:%M:%S');
             lastTime = d3.timeSecond(dateFormat(reqdata[reqdata.length-1].Timestamp)).toString();
+            lastSize = reqdata[reqdata.length-1].ResponseSize;
             console.log("starting lastTime is:" + lastTime);
             reqdata.forEach(function (d) {
               d.dd = dateFormat(d.Timestamp);
@@ -59,9 +61,9 @@
               data.push(parseInt(d.ResponseSize));
             });
             n = reqdata.length;
-            console.log(data);
+            console.log(lastSize);
         });
-        var svg,x,y,line;
+        var svg, x, y, line;
         setTimeout(function(){
           svg = d3.select("svg"),
               margin = {top: 20, right: 20, bottom: 20, left: 40},
@@ -102,12 +104,13 @@
               .datum(data)
               .attr("class", "line")
             .transition()
-              .duration(5000)
+              .duration(10000)
               .ease(d3.easeLinear)
               .on("start", tick);
-        }, 5000);
+        }, 2000);
 
         function tick() {
+          var ticked = false;
           d3.csv('reqdata/reqlog.csv'+'?'+ Math.floor(Math.random() * 1000),function (data) {
             // Since its a csv file we need to format the data a bit.
             var dateFormat = d3.timeParse('%Y-%m-%dT%H:%M:%S');
@@ -117,24 +120,38 @@
             if(lastTime != d.second){
               console.log("lasttime:" + lastTime);
               lastTime = d.second.toString();
+              lastSize = d.ResponseSize;
               console.log("new request!");
-              console.log("d.second:" + d.second)
+              console.log("d.second:" + d.second);
+              ticked = true;
             }
           });
+          var _this = this;
+          setTimeout(function(){
+            if(ticked){
+              console.log('ticked bracket');
+              data.push(lastSize);
+              //Redraw the line.
+              d3.select(_this)
+                  .attr("d", line)
+                  .attr("transform", null);
+              // Slide it to the left.
+              d3.active(_this)
+                  .attr("transform", "translate(" + x(-1) + ",0)");
+              d3.active(_this).transition()
+                  .on("start", tick);
+              // // Pop the old data point off the front.
+              data.shift();
+            }
+            else{
+              console.log('no bracket');
+              d3.active(_this).transition()
+                  .on("start", tick);
+            }
+          }, 1000);
+
           // Push a new data point onto the back.
-          data.push(200);
-          //Redraw the line.
-          d3.select(this)
-              .attr("d", line)
-              .attr("transform", null);
-          // // Slide it to the left.
-          d3.active(this)
-              .attr("transform", "translate(" + x(-1) + ",0)")
-            .transition()
-              .on("start", tick);
-          // // Pop the old data point off the front.
-          data.shift();
-        }
+      }
       </script>
     </div>
   </body>
