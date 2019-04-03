@@ -34,10 +34,6 @@ fake_data = {
 class EAIRequestHandler(BaseHTTPRequestHandler):
 
   def do_GET(self):
-    self.send_response(200)
-    self.send_header("Content-type", "text/html")
-    self.end_headers()
-
     content_length = int(self.headers['Content-Length'] or 0)
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string.decode('utf-8')) if body_string else {}
@@ -47,9 +43,15 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       reqip = EAIDatabase.find_ip(body['type'])
       r = requests.get('http://' + reqip + '/get_data',
                      data = json.dumps(payload))
-      self.wfile.write(bytes(r.text, "utf-8"))
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/json')
+      self.end_headers()
+      self.wfile.write(json.dumps(r.text).encode('utf-8'))
     if self.path == '/datatypes':
       datatypes = self.get_datatypes()
+      self.send_response(200)
+      self.send_header("Content-type", "text/html")
+      self.end_headers()
       self.wfile.write(json.dumps(datatypes).encode('utf-8'))
 
   def do_POST(self):
