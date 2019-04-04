@@ -19,6 +19,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string.decode('utf-8')) if body_string else {}
     ip = self.headers["X-Real-IP"]
+    print('Get request from IP {}'.format(ip))
 
     if self.path == '/data':
       headers = {'content-type': 'application/json'}
@@ -40,6 +41,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string.decode('utf-8'))
     ip = self.headers["X-Real-IP"]
+    print('Post request from IP {}'.format(ip))
 
     if self.path == '/register':
       self.send_response(200)
