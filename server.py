@@ -11,26 +11,6 @@ HOST_NAME = 'localhost'
 PORT_NUMBER = 9000
 
 
-fake_data = {
-  'HRPersonnel': {
-    'data': [{
-      'given_name': 'Jane',
-      'surname': 'Doe',
-      'date_of_birth': '1/1/2018'
-    }]
-  },
-  'Accounting': {
-    'data': [{
-      'item': 'laptop',
-      'cost': '1000',
-    }, {
-      'item': 'desk',
-      'cost': '500',
-    }]
-  }
-}
-
-
 class EAIRequestHandler(BaseHTTPRequestHandler):
 
   def do_GET(self):
@@ -39,14 +19,13 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     body = json.loads(body_string.decode('utf-8')) if body_string else {}
 
     if self.path == '/data':
-      reqip = EAIDatabase.find_ip(body['type'])
       headers = {'content-type': 'application/json'}
-      r = requests.get('http://' + reqip + '/get_data',
-                     data = json.dumps(body), headers = headers)
+      r = self.get_data(body, headers)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
       self.wfile.write(json.dumps(r.text).encode('utf-8'))
+
     if self.path == '/datatypes':
       datatypes = self.get_datatypes()
       self.send_response(200)
@@ -67,14 +46,12 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       self.register(ip, body)
 
     if self.path == '/data':
-      payload = {'type': body['type'],'constraints': body['constraints']}
-      reqip = EAIDatabase.find_ip(body['type'])
-      r = requests.get('http://' + reqip + '/get_data',
-                     data = json.dumps(payload))
+      r = self.get_data(body)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
       self.wfile.write(json.dumps(r.text).encode('utf-8'))
+
   def register(self, ip, body):
     if not all(attr in body for attr in ('service', 'data_provided')):
       raise RequestException('Registration request is missing fields.')
@@ -88,10 +65,13 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     EAIDatabase.register_service(ip, body)
 
-  def get_data(self, body):
-    print('Found {} data'.format(body['type']))
-    data = fake_data.get(body['type'], {'data': []})
-    return data
+  def get_data(self, body, headers={}):
+    reqip = EAIDatabase.find_ip(body['type'])
+    r = requests.get(
+      'http://' + reqip + '/get_data',
+      data=json.dumps(body),
+      headers=headers)
+    return r
 
   def get_datatypes(self):
     return EAIDatabase.get_datatypes()
