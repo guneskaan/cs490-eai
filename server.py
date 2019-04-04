@@ -82,7 +82,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       'http://' + reqip + '/get_data',
       data=json.dumps(body),
       headers=headers)
-    response_success = 1
+    response_success = 0
     response_size = len(r.text)
     datatype = body['type']
     EAIDatabase.log_request(request_ts, requestor['service'], provider['service'], response_success, response_size, datatype)

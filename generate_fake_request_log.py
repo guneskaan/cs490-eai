@@ -17,15 +17,15 @@ def generate_random_row():
     request_ts = random.randint(request_ts_min, request_ts_max)
     request_datetime = datetime.fromtimestamp(request_ts)
     success = random.randint(1, 100)
-    response_success = 1
+    response_success = 0
     if success <= 20:
-        response_success = 0
+        response_success = 1
 
     return [request_datetime, from_service, to_service, response_success, response_size, datatype]
 
-def generate_request_log(rows=1000):
+def generate_request_log(rows=100):
     with open('generated_reqlog.csv', 'w') as csvfile:
-        writer = csv.writer(csvfile)
+        writer = csv.writer(csvfile, lineterminator='\n')
         writer.writerow(headers)
         data = []
         for _ in range(rows):
