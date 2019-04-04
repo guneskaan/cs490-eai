@@ -15,7 +15,8 @@ def generate_random_row():
     request_ts = random.uniform(request_ts_min, request_ts_max)
     request_datetime = datetime.fromtimestamp(request_ts)
     success = random.uniform(1, 100)
-    response_success = random.
-    if success > 66:
+    response_success = 0
+    if success >= 80:
+        response_success = 1
 
-    return [request_datetime.strftime('%Y-%m-%dT%H:%M:%S'), from_service, to_service, 
+    return [request_datetime.strftime('%Y-%m-%dT%H:%M:%S'), from_service, to_service, response_success, datatype]
