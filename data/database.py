@@ -47,6 +47,6 @@ class EAIDatabase:
     })
 
   @classmethod
-  def log_request(cls, request_ts, requestor, responder, response_success, response_size):
-    cls.request_log_table.log(request_ts, requestor, responder, response_success, response_size)
+  def log_request(cls, request_ts, requestor, responder, response_success, response_size, datatype):
+    cls.request_log_table.log(request_ts, requestor, responder, response_success, response_size, datatype)
     cls.request_log_table.write_to_frontend()

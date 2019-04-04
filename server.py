@@ -22,7 +22,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     if self.path == '/data':
       headers = {'content-type': 'application/json'}
-      r = self.get_data(ip, body, headers)
+      r = self.get_data(body, headers, ip)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
@@ -48,7 +48,7 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       self.register(ip, body)
 
     if self.path == '/data':
-      r = self.get_data(ip, body)
+      r = self.get_data(body, ip=ip)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
@@ -67,12 +67,9 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     EAIDatabase.register_service(ip, body)
 
-  def get_data(self, ip, body, headers={}):
-    if not ip:
-      raise Exception('No requestor IP found in this request to /data!')
-
+  def get_data(self, body, headers={}, ip=''):
     request_ts = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    requestor = EAIDatabase.get_service_by_ip(ip)
+    requestor = EAIDatabase.get_service_by_ip(ip or '')
 
     if not requestor:
         requestor = {'service': 'Sales and Marketing'}
@@ -85,7 +82,8 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
       headers=headers)
     response_success = 1
     response_size = len(r.text)
-    EAIDatabase.log_request(request_ts, requestor['service'], provider['service'], response_success, response_size)
+    datatype = body['type']
+    EAIDatabase.log_request(request_ts, requestor['service'], provider['service'], response_success, response_size, datatype)
     return r
 
   def get_datatypes(self):

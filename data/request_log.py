@@ -13,8 +13,8 @@ class RequestLogTable(Table):
           row['request_body'] == row_to_find['request_body']):
         return row
 
-  def log(self, request_ts, requestor, responder, response_success, response_size):
-    self.data.append([request_ts, requestor, responder, response_success, response_size])
+  def log(self, request_ts, requestor, responder, response_success, response_size, datatype):
+    self.data.append([request_ts, requestor, responder, response_success, response_size, datatype])
 
   def write_to_frontend(self):
     with open('frontend/reqdata/reqlog.csv', 'a') as reqlog:
