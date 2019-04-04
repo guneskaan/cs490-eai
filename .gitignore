@@ -4,3 +4,4 @@ data_providers.txt
 registered_services.txt
 request_log.txt
 nohup.out
+frontend/reqdata/reqlog.csv
