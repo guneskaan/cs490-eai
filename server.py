@@ -73,6 +73,10 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     request_ts = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     requestor = EAIDatabase.get_service_by_ip(ip)
+
+    if not requestor:
+        requestor = {'service': 'Sales and Marketing'}
+
     provider = EAIDatabase.find_provider(body['type'])
     reqip = provider['ip']
     r = requests.get(
