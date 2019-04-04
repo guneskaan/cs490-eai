@@ -26,6 +26,10 @@
         .domain{
           stroke: #fff;
         }
+
+        .textmargin{
+          margin: 10px;
+        }
         .tick line{
           stroke: #fff !important;
         }
@@ -51,7 +55,7 @@
     }
     .label {
       fill: #FFFFFF;
-      font-size: 15px;
+      font-size: 9px;
       text-anchor: middle;
     }
     .axislabel {
@@ -111,7 +115,7 @@
       var valueline = d3.svg.line()
           .x(function(d) { return x(d.Timestamp); })
           .y(function(d) { return y(d.ResponseSize); });
-
+      var lastStamp;
       var label;
       // Adds the svg canvas
       var svg = d3.select(".placement")
@@ -123,6 +127,7 @@
                     "translate(" + margin.left + "," + margin.top + ")");
       d3.csv('reqdata/reqlog.csv'+'?'+ Math.floor(Math.random() * 1000), function (data) {
           data = data.slice(-9);
+          lastStamp = data[data.length-1].Timestamp.toString();
           data.forEach(function (d) {
             d.Timestamp = parseDate(d.Timestamp);
             d.ResponseSize = +d.ResponseSize;
@@ -163,13 +168,17 @@
             .enter().append("g")
               .attr("class", "label")
               .attr("transform", function(d, i) {
-                console.log(d);
                 return "translate(" + x(d.Timestamp) + "," + y(d.ResponseSize) + ")"; });
           label.append("text")
-              .attr("dy", ".35em")
+              .attr("class", "textmargin")
+              .attr("dy", function(){
+                  return (Math.random() < 0.5 ? -1 : 1)+"em";
+              })
+              .attr("dx", function(){
+                  return (Math.random() < 0.5 ? -1 : 1)+"em";
+              })
               .text(function(d) {
-                return (d.Requester+" -> " +d.Responder
-                                  + " (" + d.Type +")");})
+                return (d.Requester+" -> " +d.Responder);})
             .filter(function(d, i) { return i === data.length - 1; });
 
       });
@@ -183,6 +192,11 @@
           // Get the data again
           d3.csv("reqdata/reqlog.csv"+'?'+ Math.floor(Math.random() * 1000), function(data) {
             data = data.slice(-9);
+            var update = false;
+            var newStamp = data[data.length-1].Timestamp.toString();
+            if(newStamp == lastStamp)return;
+            lastStamp = newStamp;
+
             data.forEach(function (d) {
               d.Timestamp = parseDate(d.Timestamp);
               d.ResponseSize = +d.ResponseSize;
@@ -211,12 +225,17 @@
                 .attr("transform", function(d, i) {
                     return "translate(" + x(d.Timestamp) + "," + y(d.ResponseSize) + ")"; });
               label.append("text")
-                  .attr("dy", ".35em")
+                  .attr("dy", function(){
+                      return (Math.random() < 0.5 ? -1 : 1)+"em";
+                  })
+                  .attr("dx", function(){
+                      return (Math.random() < 0.5 ? -1 : 1)+"em";
+                  })
+                  .attr("class", "textmargin")
                   .text(function(d) {
                     return (d.Requester+" -> " +d.Responder
                                       + " (" + d.Type +")");})
                 .filter(function(d, i) { return i === data.length - 1; });
-
           });
       }
 
