@@ -5,3 +5,4 @@ registered_services.txt
 request_log.txt
 nohup.out
 frontend/reqdata/reqlog.csv
+frontend/reqdata/reqlog.csv.bak
