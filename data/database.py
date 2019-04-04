@@ -34,10 +34,19 @@ class EAIDatabase:
     return cls.data_providers_table.get_datatypes_provided()
 
   @classmethod
-  def find_ip(cls, type):
+  def get_service_by_ip(cls, ip):
+    return cls.registered_services_table.find_row_by_ip(ip)
+
+  @classmethod
+  def find_provider(cls, datatype):
     service = cls.data_providers_table.find_ip_row({
-        'data_provided': type
+        'data_provided': datatype
     })
     return cls.registered_services_table.find_ip_row({
         'id': service['provider_id']
-    })['ip']
+    })
+
+  @classmethod
+  def log_request(cls, request_ts, requestor, responder, response_success, response_size):
+    cls.request_log_table.log(request_ts, requestor, responder, response_success, response_size)
+    cls.request_log_table.write_to_frontend()

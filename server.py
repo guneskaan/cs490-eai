@@ -1,5 +1,6 @@
 import json
 import requests
+import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from data.database import EAIDatabase
@@ -11,42 +12,22 @@ HOST_NAME = 'localhost'
 PORT_NUMBER = 9000
 
 
-fake_data = {
-  'HRPersonnel': {
-    'data': [{
-      'given_name': 'Jane',
-      'surname': 'Doe',
-      'date_of_birth': '1/1/2018'
-    }]
-  },
-  'Accounting': {
-    'data': [{
-      'item': 'laptop',
-      'cost': '1000',
-    }, {
-      'item': 'desk',
-      'cost': '500',
-    }]
-  }
-}
-
-
 class EAIRequestHandler(BaseHTTPRequestHandler):
 
   def do_GET(self):
     content_length = int(self.headers['Content-Length'] or 0)
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string.decode('utf-8')) if body_string else {}
+    ip = self.headers["X-Real-IP"]
 
     if self.path == '/data':
-      reqip = EAIDatabase.find_ip(body['type'])
       headers = {'content-type': 'application/json'}
-      r = requests.get('http://' + reqip + '/get_data',
-                     data = json.dumps(body), headers = headers)
+      r = self.get_data(ip, body, headers)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
       self.wfile.write(json.dumps(r.text).encode('utf-8'))
+
     if self.path == '/datatypes':
       datatypes = self.get_datatypes()
       self.send_response(200)
@@ -58,23 +39,21 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     content_length = int(self.headers['Content-Length'])
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string.decode('utf-8'))
+    ip = self.headers["X-Real-IP"]
 
     if self.path == '/register':
       self.send_response(200)
       self.send_header("Content-type", "text/html")
       self.end_headers()
-      ip = self.headers["X-Real-IP"]
       self.register(ip, body)
 
     if self.path == '/data':
-      payload = {'type': body['type'],'constraints': body['constraints']}
-      reqip = EAIDatabase.find_ip(body['type'])
-      r = requests.get('http://' + reqip + '/get_data',
-                     data = json.dumps(payload))
+      r = self.get_data(ip, body)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
       self.wfile.write(json.dumps(r.text).encode('utf-8'))
+
   def register(self, ip, body):
     if not all(attr in body for attr in ('service', 'data_provided')):
       raise RequestException('Registration request is missing fields.')
@@ -88,10 +67,22 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     EAIDatabase.register_service(ip, body)
 
-  def get_data(self, body):
-    print('Found {} data'.format(body['type']))
-    data = fake_data.get(body['type'], {'data': []})
-    return data
+  def get_data(self, ip, body, headers={}):
+    if not ip:
+      raise Exception('No requestor IP found in this request to /data!')
+
+    request_ts = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    requestor = EAIDatabase.get_service_by_ip(ip)
+    provider = EAIDatabase.find_provider(body['type'])
+    reqip = provider['ip']
+    r = requests.get(
+      'http://' + reqip + '/get_data',
+      data=json.dumps(body),
+      headers=headers)
+    response_success = 1
+    response_size = len(r.text)
+    EAIDatabase.log_request(request_ts, requestor['service'], provider['service'], response_success, response_size)
+    return r
 
   def get_datatypes(self):
     return EAIDatabase.get_datatypes()
