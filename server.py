@@ -1,5 +1,6 @@
 import json
 import requests
+import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from data.database import EAIDatabase
@@ -17,10 +18,11 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     content_length = int(self.headers['Content-Length'] or 0)
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string.decode('utf-8')) if body_string else {}
+    ip = self.headers["X-Real-IP"]
 
     if self.path == '/data':
       headers = {'content-type': 'application/json'}
-      r = self.get_data(body, headers)
+      r = self.get_data(ip, body, headers)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
@@ -37,16 +39,16 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
     content_length = int(self.headers['Content-Length'])
     body_string = self.rfile.read(content_length)
     body = json.loads(body_string.decode('utf-8'))
+    ip = self.headers["X-Real-IP"]
 
     if self.path == '/register':
       self.send_response(200)
       self.send_header("Content-type", "text/html")
       self.end_headers()
-      ip = self.headers["X-Real-IP"]
       self.register(ip, body)
 
     if self.path == '/data':
-      r = self.get_data(body)
+      r = self.get_data(ip, body)
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
@@ -65,12 +67,21 @@ class EAIRequestHandler(BaseHTTPRequestHandler):
 
     EAIDatabase.register_service(ip, body)
 
-  def get_data(self, body, headers={}):
-    reqip = EAIDatabase.find_ip(body['type'])
+  def get_data(self, ip, body, headers={}):
+    if not ip:
+      raise Exception('No requestor IP found in this request to /data!')
+
+    request_ts = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    requestor = EAIDatabase.get_service_by_ip(ip)
+    provider = EAIDatabase.find_provider(body['type'])
+    reqip = provider['ip']
     r = requests.get(
       'http://' + reqip + '/get_data',
       data=json.dumps(body),
       headers=headers)
+    response_success = 1
+    response_size = len(r.text)
+    EAIDatabase.log_request(request_ts, requestor['service'], provider['service'], response_success, response_size)
     return r
 
   def get_datatypes(self):

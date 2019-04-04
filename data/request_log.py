@@ -1,4 +1,5 @@
 from data.table import Table
+import csv
 
 
 class RequestLogTable(Table):
@@ -11,3 +12,11 @@ class RequestLogTable(Table):
           row['requested_data'] == row_to_find['requested_data'] and
           row['request_body'] == row_to_find['request_body']):
         return row
+
+  def log(self, request_ts, requestor, responder, response_success, response_size):
+    self.data.append([request_ts, requestor, responder, response_success, response_size])
+
+  def write_to_frontend(self):
+    with open('frontend/reqdata/reqlog.csv', 'a') as reqlog:
+      dict_writer = csv.writer(reqlog)
+      dict_writer.writerows(self.data)
