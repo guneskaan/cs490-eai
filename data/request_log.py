@@ -18,5 +18,5 @@ class RequestLogTable(Table):
 
   def write_to_frontend(self):
     with open('frontend/reqdata/reqlog.csv', 'a') as reqlog:
-      dict_writer = csv.writer(reqlog)
-      dict_writer.writerows(self.data)
+      writer = csv.writer(reqlog, lineterminator='\n')
+      writer.writerows(self.data)
