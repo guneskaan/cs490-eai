@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+
+      <link rel="stylesheet" type="text/css" href="css/style.css"/>
+      <!-- Bootstrap CDN -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+      <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+      <!-- Prototype CSS -->
+      <link rel="stylesheet" type="text/css" href="css/prototype.css" />
+      <!-- Template CSS Files -->
+      <link rel="stylesheet" type="text/css" href="lib/dc.css"/>
+      <style>
+        .line {
+          fill: none;
+          stroke: rgb(153, 223, 239);
+          stroke-width: 1.5px;
+        }
+        .axis{
+          stroke: #fff;
+        }
+        .domain{
+          stroke: #fff;
+        }
+        .tick line{
+          stroke: #fff !important;
+        }
+
+      </style>
+  </head>
+  <style> /* set the CSS */
+
+    body { font: 12px Arial;}
+
+    path {
+        stroke: steelblue;
+        stroke-width: 2;
+        fill: none;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: grey;
+        stroke-width: 1;
+        shape-rendering: crispEdges;
+    }
+    .label {
+      fill: #FFFFFF;
+      font-size: 15px;
+      text-anchor: middle;
+    }
+    .axislabel {
+      fill: #FFFFFF;
+      font-size: 15px;
+      text-anchor: middle;
+    }
+
+    .label rect {
+      fill: white;
+    }
+
+    .label-key {
+      font-weight: bold;
+    }
+
+    </style>
+  <body>
+    <div id="fullpage" style="position: absolute; height:100%; width:100%;">
+      <div class="section text-white" id="ap">
+          <div class="container-fluid">
+              <h2 class="mx-auto text-center" style="padding-top: 30px;">EAI Live Request Dashboard</h2>
+              <div class="row">
+                <div class="button liveDashboardButton">
+                  <a href="index.html" class="whitetext">Report Generation View</a>
+                </div>
+              </div>
+              <div class="row placement">
+              </div>
+          </div>
+      </div>
+    <!-- load the d3.js library -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+    <script>
+
+      // Set the dimensions of the canvas / graph
+      var margin = {top: 50, right: 150, bottom: 120, left: 150},
+          width = 1200 - margin.left - margin.right,
+          height = 575 - margin.top - margin.bottom;
+
+      // Parse the date / time
+      var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
+
+      // Set the ranges
+      var x = d3.time.scale().range([0, width]);
+      var y = d3.scale.linear().range([height, 0]);
+
+      // Define the axes
+      var xAxis = d3.svg.axis().scale(x)
+          .orient("bottom").ticks(5);
+
+      var yAxis = d3.svg.axis().scale(y)
+          .orient("left").ticks(5);
+
+      // Define the line
+      var valueline = d3.svg.line()
+          .x(function(d) { return x(d.Timestamp); })
+          .y(function(d) { return y(d.ResponseSize); });
+
+      var label;
+      // Adds the svg canvas
+      var svg = d3.select(".placement")
+          .append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+              .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+      d3.csv('reqdata/reqlog.csv'+'?'+ Math.floor(Math.random() * 1000), function (data) {
+          data = data.slice(-9);
+          data.forEach(function (d) {
+            d.Timestamp = parseDate(d.Timestamp);
+            d.ResponseSize = +d.ResponseSize;
+          });
+          // Scale the range of the data
+          x.domain(d3.extent(data, function(d) { return d.Timestamp; }));
+          y.domain([0, d3.max(data, function(d) { return d.ResponseSize; })]);
+
+          // Add the valueline path.
+          var path = svg.append("path")
+              .attr("class", "line")
+              .attr("d", valueline(data));
+          // Add the X Axis
+          svg.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis);
+          svg.append("text")
+              .attr("class", "x axislabel")
+              .attr("text-anchor", "end")
+              .attr("x", width/2)
+              .attr("y", height + 50)
+              .text("Request Time");
+          svg.append("text")
+              .attr("class", "y axislabel")
+              .attr("transform", "rotate(-90)")
+              .attr("y", 0 - 70)
+              .attr("x", 0 - (height / 2))
+              .attr("dy", "1em")
+              .style("text-anchor", "middle")
+              .text("Request Size (in KB)");
+          // Add the Y Axis
+          svg.append("g")
+              .attr("class", "y axis")
+              .call(yAxis);
+          label = svg.selectAll(".label")
+              .data(data)
+            .enter().append("g")
+              .attr("class", "label")
+              .attr("transform", function(d, i) {
+                console.log(d);
+                return "translate(" + x(d.Timestamp) + "," + y(d.ResponseSize) + ")"; });
+          label.append("text")
+              .attr("dy", ".35em")
+              .text(function(d) {
+                return (d.Requester+" -> " +d.Responder
+                                  + " (" + d.Type +")");})
+            .filter(function(d, i) { return i === data.length - 1; });
+
+      });
+
+      var inter = setInterval(function() {
+              updateData();
+      }, 5000);
+
+      // ** Update data section (Called from the onclick)
+      function updateData() {
+          // Get the data again
+          d3.csv("reqdata/reqlog.csv"+'?'+ Math.floor(Math.random() * 1000), function(data) {
+            data = data.slice(-9);
+            data.forEach(function (d) {
+              d.Timestamp = parseDate(d.Timestamp);
+              d.ResponseSize = +d.ResponseSize;
+            });
+
+          	// Scale the range of the data again
+          	x.domain(d3.extent(data, function(d) { return d.Timestamp; }));
+      	    y.domain([0, d3.max(data, function(d) { return d.ResponseSize; })]);
+
+          // Select the section we want to apply our changes to
+          var svg = d3.select(".placement").transition();
+          // Make the changes
+              svg.select(".line")   // change the line
+                  .duration(750)
+                  .attr("d", valueline(data));
+              svg.select(".x.axis") // change the x axis
+                  .duration(750)
+                  .call(xAxis);
+              svg.select(".y.axis") // change the y axis
+                  .duration(750)
+                  .call(yAxis);
+
+              label.attr("transform", null);
+              label.selectAll("text").remove();
+              label.data(data)
+                .attr("transform", function(d, i) {
+                    return "translate(" + x(d.Timestamp) + "," + y(d.ResponseSize) + ")"; });
+              label.append("text")
+                  .attr("dy", ".35em")
+                  .text(function(d) {
+                    return (d.Requester+" -> " +d.Responder
+                                      + " (" + d.Type +")");})
+                .filter(function(d, i) { return i === data.length - 1; });
+
+          });
+      }
+
+    </script>
+    </div>
+  </body>
+</html>
